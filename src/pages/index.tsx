@@ -28,9 +28,19 @@ interface HomeProps {
 }
 
 export default function Home({ postsPagination }: HomeProps): ReactElement {
+  console.log(postsPagination.results);
   return (
     <>
-      <p>hello world</p>
+      {postsPagination.results.map(post => {
+        return (
+          <div key={post.uid}>
+            <strong>{post.data.title}</strong>
+            <p>{post.data.subtitle}</p>
+            <span>{post.first_publication_date}</span>
+            <span>{post.data.author}</span>
+          </div>
+        );
+      })}
     </>
   );
 }
@@ -56,7 +66,7 @@ export const getStaticProps: GetStaticProps = async () => {
 
   return {
     props: {
-      postPagination: {
+      postsPagination: {
         next_page: response.next_page,
         results,
       },
