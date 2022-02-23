@@ -2,11 +2,11 @@ import { GetStaticProps } from 'next';
 import { ReactElement } from 'react';
 
 import Prismic from '@prismicio/client';
+import { RichText } from 'prismic-dom';
 import { getPrismicClient } from '../services/prismic';
 
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
-import { RichText } from 'prismic-dom';
 
 interface Post {
   uid?: string;
@@ -27,7 +27,8 @@ interface HomeProps {
   postsPagination: PostPagination;
 }
 
-export default function Home(): ReactElement {
+export default function Home({ posts }): ReactElement {
+  console.log(posts);
   return (
     <>
       <p>hello world</p>
@@ -57,11 +58,7 @@ export const getStaticProps: GetStaticProps = async () => {
       uid: post.uid,
       first_publication_date: post.last_publication_date,
       next_page: post.url,
-      data: {
-        title: RichText.asText(post.data.title),
-        subtitle: RichText.asText(post.data.subtitle),
-        author: RichText.asText(post.data.author),
-      },
+      data: post.data,
     };
   });
 
