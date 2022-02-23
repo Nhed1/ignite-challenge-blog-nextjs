@@ -34,5 +34,4 @@ export default function Home(): ReactElement {
 
 export const getStaticProps: GetStaticProps = async () => {
   const prismic = getPrismicClient(process.env.PRISMIC_API_ENDPOINT, { req });
-  const postsResponse = await prismic.query();
 };
