@@ -7,11 +7,12 @@
 
 .post {
   max-width: 720px;
-  margin: 5rem auto 0;
+  margin: 2.5rem auto 0;
 
   strong {
     display: block;
     font-size: 2rem;
+    font-weight: 600;
   }
 
   p {
@@ -31,6 +32,6 @@
   strong,
   p,
   .info {
-    padding: 0.5rem;
+    padding: 0.5rem 0;
   }
 }

@@ -31,7 +31,6 @@ interface HomeProps {
 }
 
 export default function Home({ postsPagination }: HomeProps): ReactElement {
-  console.log(postsPagination.results);
   return (
     <div className={styles.container}>
       {postsPagination.results.map(post => {
