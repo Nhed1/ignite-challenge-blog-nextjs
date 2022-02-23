@@ -27,8 +27,7 @@ interface HomeProps {
   postsPagination: PostPagination;
 }
 
-export default function Home({ posts }): ReactElement {
-  console.log(posts);
+export default function Home({ postsPagination }: HomeProps): ReactElement {
   return (
     <>
       <p>hello world</p>
@@ -42,27 +41,25 @@ export const getStaticProps: GetStaticProps = async () => {
   const response = await prismic.query(
     [Prismic.predicates.at('document.type', 'posts')],
     {
-      fetch: [
-        'posts.title',
-        'posts.subtitle',
-        'posts.author',
-        'posts.banner',
-        'posts.content',
-      ],
+      fetch: ['posts.title', 'posts.subtitle', 'posts.author', 'posts.content'],
       pageSize: 2,
     }
   );
 
-  const posts = response.results.map(post => {
+  const results = response.results.map(post => {
     return {
       uid: post.uid,
       first_publication_date: post.last_publication_date,
-      next_page: post.url,
       data: post.data,
     };
   });
 
   return {
-    props: { posts },
+    props: {
+      postPagination: {
+        next_page: response.next_page,
+        results,
+      },
+    },
   };
 };
