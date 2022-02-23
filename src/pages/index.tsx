@@ -1,6 +1,9 @@
 import { GetStaticProps } from 'next';
 import { ReactElement } from 'react';
 
+import ptBR from 'date-fns/locale/pt-BR';
+import { format } from 'date-fns';
+
 import Prismic from '@prismicio/client';
 import { RichText } from 'prismic-dom';
 import { getPrismicClient } from '../services/prismic';
@@ -30,18 +33,20 @@ interface HomeProps {
 export default function Home({ postsPagination }: HomeProps): ReactElement {
   console.log(postsPagination.results);
   return (
-    <>
+    <div className={styles.container}>
       {postsPagination.results.map(post => {
         return (
-          <div key={post.uid}>
+          <article className={styles.post} key={post.uid}>
             <strong>{post.data.title}</strong>
             <p>{post.data.subtitle}</p>
-            <span>{post.first_publication_date}</span>
-            <span>{post.data.author}</span>
-          </div>
+            <div className={styles.info}>
+              <span>{post.first_publication_date}</span>
+              <span>{post.data.author}</span>
+            </div>
+          </article>
         );
       })}
-    </>
+    </div>
   );
 }
 
@@ -59,7 +64,11 @@ export const getStaticProps: GetStaticProps = async () => {
   const results = response.results.map(post => {
     return {
       uid: post.uid,
-      first_publication_date: post.last_publication_date,
+      first_publication_date: format(
+        new Date(post.last_publication_date),
+        'dd MMM yyyy',
+        { locale: ptBR }
+      ),
       data: post.data,
     };
   });
