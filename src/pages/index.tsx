@@ -33,14 +33,11 @@ interface HomeProps {
 }
 
 export default function Home({ postsPagination }: HomeProps): ReactElement {
-  const [posts, setPosts] = useState([]);
-  useEffect(() => {
-    setPosts(state => [...state, postsPagination]);
-  }, []);
+  const [posts, setPosts] = useState(postsPagination.results);
 
   async function loadNextPage(url: string) {
     const response = await fetch(url).then(res => res.json());
-    return response.results;
+    setPosts(state => [...state, ...response.results]);
   }
 
   const LoadButton = postsPagination.next_page ? (
@@ -53,7 +50,7 @@ export default function Home({ postsPagination }: HomeProps): ReactElement {
 
   return (
     <div className={styles.container}>
-      {postsPagination.results.map(post => {
+      {posts.map(post => {
         return (
           <article className={styles.post} key={post.uid}>
             <strong>{post.data.title}</strong>
