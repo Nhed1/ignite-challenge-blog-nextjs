@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable react/button-has-type */
 import { GetStaticProps } from 'next';
-import { ReactElement } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 
 import ptBR from 'date-fns/locale/pt-BR';
 import { format } from 'date-fns';
@@ -31,6 +33,24 @@ interface HomeProps {
 }
 
 export default function Home({ postsPagination }: HomeProps): ReactElement {
+  const [posts, setPosts] = useState([]);
+  useEffect(() => {
+    setPosts(state => [...state, postsPagination]);
+  }, []);
+
+  async function loadNextPage(url: string) {
+    const response = await fetch(url).then(res => res.json());
+    return response.results;
+  }
+
+  const LoadButton = postsPagination.next_page ? (
+    <button onClick={() => loadNextPage(postsPagination.next_page)}>
+      Carregar mais posts
+    </button>
+  ) : (
+    <></>
+  );
+
   return (
     <div className={styles.container}>
       {postsPagination.results.map(post => {
@@ -42,6 +62,7 @@ export default function Home({ postsPagination }: HomeProps): ReactElement {
               <span>{post.first_publication_date}</span>
               <span>{post.data.author}</span>
             </div>
+            {LoadButton}
           </article>
         );
       })}
@@ -56,7 +77,7 @@ export const getStaticProps: GetStaticProps = async () => {
     [Prismic.predicates.at('document.type', 'posts')],
     {
       fetch: ['posts.title', 'posts.subtitle', 'posts.author', 'posts.content'],
-      pageSize: 2,
+      pageSize: 1,
     }
   );
 
