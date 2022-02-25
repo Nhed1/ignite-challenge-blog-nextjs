@@ -34,19 +34,13 @@ interface HomeProps {
 
 export default function Home({ postsPagination }: HomeProps): ReactElement {
   const [posts, setPosts] = useState(postsPagination.results);
+  const [nextPage, setNextPage] = useState(postsPagination.next_page);
 
   async function loadNextPage(url: string) {
-    const response = await fetch(url).then(res => res.json());
-    setPosts(state => [...state, ...response.results]);
+    const data = await fetch(url).then(response => response.json());
+    setNextPage(data.next_page);
+    setPosts(state => [...state, ...data.results]);
   }
-
-  const LoadButton = postsPagination.next_page ? (
-    <button onClick={() => loadNextPage(postsPagination.next_page)}>
-      Carregar mais posts
-    </button>
-  ) : (
-    <></>
-  );
 
   return (
     <div className={styles.container}>
@@ -59,7 +53,11 @@ export default function Home({ postsPagination }: HomeProps): ReactElement {
               <span>{post.first_publication_date}</span>
               <span>{post.data.author}</span>
             </div>
-            {LoadButton}
+            {nextPage && (
+              <button onClick={() => loadNextPage(nextPage)}>
+                Carregar mais posts
+              </button>
+            )}
           </article>
         );
       })}
