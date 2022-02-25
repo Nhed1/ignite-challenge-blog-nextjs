@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable react/button-has-type */
 import { GetStaticProps } from 'next';
-import { ReactElement, useEffect, useState } from 'react';
-
+import { ReactElement, useState } from 'react';
+import Link from 'next/link';
 import ptBR from 'date-fns/locale/pt-BR';
 import { format } from 'date-fns';
 
 import Prismic from '@prismicio/client';
 import { RichText } from 'prismic-dom';
+import { Head } from 'next/document';
 import { getPrismicClient } from '../services/prismic';
 
 import commonStyles from '../styles/common.module.scss';
@@ -46,13 +47,18 @@ export default function Home({ postsPagination }: HomeProps): ReactElement {
     <div className={styles.container}>
       {posts.map(post => {
         return (
-          <article className={styles.post} key={post.uid}>
-            <strong>{post.data.title}</strong>
+          <article key={post.uid} className={styles.post}>
+            <Link href={`/post/${post.uid}`}>
+              <a>
+                <strong>{post.data.title}</strong>
+              </a>
+            </Link>
             <p>{post.data.subtitle}</p>
             <div className={styles.info}>
               <span>{post.first_publication_date}</span>
               <span>{post.data.author}</span>
             </div>
+
             {nextPage && (
               <button onClick={() => loadNextPage(nextPage)}>
                 Carregar mais posts
