@@ -54,12 +54,13 @@ export default function Post({ post }) {
 }
 
 export const getStaticPaths = async () => {
-  // const prismic = getPrismicClient();
+  const prismic = getPrismicClient();
+  const response = await prismic.getByUID('post', 'como-utilizar-hooks', {});
+
   return {
-    paths: [],
-    fallback: 'blocking',
+    paths: [{ response }],
+    fallback: 'true',
   };
-  // const posts = await prismic.query([Prismic.predicates.at("document.type")]);
 };
 
 export const getStaticProps = async context => {
@@ -68,7 +69,6 @@ export const getStaticProps = async context => {
   const { slug } = context.params;
 
   const response = await prismic.getByUID('post', String(slug), {});
-  console.log(response);
 
   const post = {
     data: {
@@ -84,5 +84,5 @@ export const getStaticProps = async context => {
       },
     },
   };
-  return { props: { post } };
+  return { props: { post }, redirect: 60 * 30 }; // 30 minutes
 };
