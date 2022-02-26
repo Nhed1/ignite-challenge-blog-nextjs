@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable react/no-danger */
 /* eslint-disable react/self-closing-comp */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
@@ -7,6 +8,10 @@ import { RichText } from 'prismic-dom';
 
 import { format } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
+
+import { FaUser } from 'react-icons/fa';
+import { BiTime } from 'react-icons/bi';
+import { MdOutlineDateRange } from 'react-icons/md';
 
 import Prismic from '@prismicio/client';
 import { getPrismicClient } from '../../services/prismic';
@@ -46,9 +51,16 @@ export default function Post({ post }: PostProps) {
           <header className={styles.header}>
             <h1>{post.data.title}</h1>
             <div className={styles.info}>
-              <span>{post.first_publication_date}</span>
-              <span>{post.data.author}</span>
               <span>
+                <MdOutlineDateRange />
+                {post.first_publication_date}
+              </span>
+              <span>
+                <FaUser />
+                {post.data.author}
+              </span>
+              <span>
+                <BiTime />
                 {post.data.content.reduce((acumulator, element) => {
                   const AVARAGE_READ_TIME = 200; // 200 words per minute;
                   const headingLen = element.heading.split(' ').length;
@@ -83,13 +95,15 @@ export const getStaticPaths = async () => {
   const response = await prismic.query(
     [Prismic.predicates.at('document.type', 'posts')],
     {
-      fetch: ['post.uid'],
-      pageSize: 100,
+      fetch: [],
+      pageSize: 1,
     }
   );
 
   return {
-    paths: [{ params: { slug: 'como-utilizar-hooks' } }],
+    paths: response.results.map(post => ({
+      params: { slug: post.uid },
+    })),
     fallback: true,
   };
 };
@@ -99,7 +113,6 @@ export const getStaticProps = async context => {
   const prismic = getPrismicClient();
 
   const response = await prismic.getByUID('posts', String(slug), {});
-  console.log(response.data.content);
   const post = {
     uid: response.uid,
     first_publication_date: format(
@@ -116,5 +129,5 @@ export const getStaticProps = async context => {
       },
     },
   };
-  return { props: { post }, redirect: 60 * 30 }; // 30 minutes
+  return { props: { post }, revalidate: 60 * 5 }; // 5 minutes
 };
