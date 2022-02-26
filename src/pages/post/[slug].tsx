@@ -13,6 +13,8 @@ import { FaUser } from 'react-icons/fa';
 import { BiTime } from 'react-icons/bi';
 import { MdOutlineDateRange } from 'react-icons/md';
 
+import { useRouter } from 'next/router';
+
 import Prismic from '@prismicio/client';
 import { getPrismicClient } from '../../services/prismic';
 
@@ -41,7 +43,11 @@ interface PostProps {
 }
 
 export default function Post({ post }: PostProps) {
-  console.log(post);
+  const router = useRouter();
+  if (router.isFallback) {
+    return <span>Carregando...</span>;
+  }
+
   return (
     <>
       <div className={styles.container}>
@@ -90,13 +96,13 @@ export default function Post({ post }: PostProps) {
   );
 }
 
-export const getStaticPaths = async () => {
+export const getStaticPaths: GetStaticPaths = async () => {
   const prismic = getPrismicClient();
   const response = await prismic.query(
     [Prismic.predicates.at('document.type', 'posts')],
     {
       fetch: [],
-      pageSize: 1,
+      pageSize: 10,
     }
   );
 
@@ -108,7 +114,7 @@ export const getStaticPaths = async () => {
   };
 };
 
-export const getStaticProps = async context => {
+export const getStaticProps: GetStaticProps = async context => {
   const { slug } = context.params;
   const prismic = getPrismicClient();
 

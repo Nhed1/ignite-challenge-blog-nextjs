@@ -43,7 +43,6 @@ export default function Home({ postsPagination }: HomeProps): ReactElement {
   async function loadNextPage(url: string) {
     const data = await fetch(url).then(response => response.json());
     setNextPage(data.next_page);
-    console.log(data);
 
     setPosts(state => [...state, ...data.results]);
   }
@@ -87,22 +86,26 @@ export default function Home({ postsPagination }: HomeProps): ReactElement {
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getStaticProps: GetStaticProps<HomeProps> = async () => {
   const prismic = getPrismicClient();
 
   const response = await prismic.query(
     [Prismic.predicates.at('document.type', 'posts')],
     {
-      fetch: ['posts.title', 'posts.subtitle', 'posts.author', 'posts.content'],
+      fetch: ['posts.title', 'posts.subtitle', 'posts.author'],
       pageSize: 1,
     }
   );
 
-  const results = response.results.map(post => {
+  const posts = response.results.map(post => {
     return {
       uid: post.uid,
       first_publication_date: post.last_publication_date,
-      data: post.data,
+      data: {
+        title: post.data.title,
+        subtitle: post.data.subtitle,
+        author: post.data.author,
+      },
     };
   });
 
@@ -110,7 +113,7 @@ export const getStaticProps: GetStaticProps = async () => {
     props: {
       postsPagination: {
         next_page: response.next_page,
-        results,
+        results: posts,
       },
     },
   };
