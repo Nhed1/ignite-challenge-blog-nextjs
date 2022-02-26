@@ -32,34 +32,34 @@ interface PostProps {
   post: Post;
 }
 
-export default function Post({ post }) {
-  console.log(post);
+export default function Post({ post }: PostProps) {
   return (
     <>
-      <div key={post.uid} className={styles.container}>
-        <div>
-          <img src={post.data.banner.url} alt="banner" />
+      <div className={styles.container}>
+        <img src={post.data.banner.url} alt="banner" />
+
+        <div className={styles.content}>
+          <header className={styles.header}>
+            <h1>{post.data.title}</h1>
+            <div className={styles.info}>
+              <span>{post.first_publication_date}</span>
+              <span>{post.data.author}</span>
+              <span>Tempo de leitura!</span>
+            </div>
+          </header>
+          {post.data.content.map(elementContent => {
+            return (
+              <article className={styles.content}>
+                <h2>{elementContent.heading}</h2>
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: RichText.asHtml(elementContent.body),
+                  }}
+                ></div>
+              </article>
+            );
+          })}
         </div>
-        <header>
-          <h1>{post.data.title}</h1>
-          <div className="info">
-            <span>{post.first_publication_date}</span>
-            <span>{post.data.author}</span>
-            <span>Tempo de leitura!</span>
-          </div>
-        </header>
-        {post.data.content.map(elementContent => {
-          return (
-            <article className={styles.content}>
-              <h2>{elementContent.heading}</h2>
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: RichText.asHtml(elementContent.body),
-                }}
-              ></div>
-            </article>
-          );
-        })}
       </div>
     </>
   );

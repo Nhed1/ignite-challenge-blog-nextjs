@@ -60,7 +60,10 @@ export default function Home({ postsPagination }: HomeProps): ReactElement {
             </div>
 
             {nextPage && (
-              <button onClick={() => loadNextPage(nextPage)}>
+              <button
+                className={styles.loadMore}
+                onClick={() => loadNextPage(nextPage)}
+              >
                 Carregar mais posts
               </button>
             )}
