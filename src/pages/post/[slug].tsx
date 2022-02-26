@@ -39,7 +39,7 @@ export default function Post({ post }) {
           <img src={post.data.banner.url} alt="banner" />
         </div>
         <header>
-          <h1>{post.title}</h1>
+          <h1>{post.data.title}</h1>
           <div className="info">
             <span>{post.first_publication_date}</span>
             <span>{post.data.author}</span>

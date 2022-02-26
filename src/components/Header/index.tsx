@@ -7,7 +7,11 @@ export default function Header(): ReactElement {
     <>
       <header className={styles.header}>
         <div className={styles.image}>
-          <img src="/images/Logo.svg" alt="logo" />
+          <Link href="/">
+            <a>
+              <img src="/images/Logo.svg" alt="logo" />
+            </a>
+          </Link>
         </div>
       </header>
     </>
