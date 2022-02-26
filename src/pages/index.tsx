@@ -40,6 +40,8 @@ export default function Home({ postsPagination }: HomeProps): ReactElement {
   async function loadNextPage(url: string) {
     const data = await fetch(url).then(response => response.json());
     setNextPage(data.next_page);
+    console.log(data);
+
     setPosts(state => [...state, ...data.results]);
   }
 
@@ -55,7 +57,11 @@ export default function Home({ postsPagination }: HomeProps): ReactElement {
             </Link>
             <p>{post.data.subtitle}</p>
             <div className={styles.info}>
-              <span>{post.first_publication_date}</span>
+              <span>
+                {format(new Date(post.first_publication_date), 'dd MMM yyyy', {
+                  locale: ptBR,
+                })}
+              </span>
               <span>{post.data.author}</span>
             </div>
 
@@ -88,11 +94,7 @@ export const getStaticProps: GetStaticProps = async () => {
   const results = response.results.map(post => {
     return {
       uid: post.uid,
-      first_publication_date: format(
-        new Date(post.last_publication_date),
-        'dd MMM yyyy',
-        { locale: ptBR }
-      ),
+      first_publication_date: post.last_publication_date,
       data: post.data,
     };
   });
