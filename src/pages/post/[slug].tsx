@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { GetStaticPaths, GetStaticProps } from 'next';
-import { useRouter } from 'next/router';
 import { RichText } from 'prismic-dom';
 
+import Prismic from '@prismicio/client';
 import { getPrismicClient } from '../../services/prismic';
 
 import commonStyles from '../../styles/common.module.scss';
@@ -55,32 +55,41 @@ export default function Post({ post }) {
 
 export const getStaticPaths = async () => {
   const prismic = getPrismicClient();
-  const response = await prismic.getByUID('post', 'como-utilizar-hooks', {});
+  const response = await prismic.query(
+    [Prismic.predicates.at('document.type', 'posts')],
+    {
+      fetch: ['post.uid'],
+      pageSize: 100,
+    }
+  );
 
   return {
-    paths: [{ response }],
-    fallback: 'true',
+    paths: [{ params: { slug: 'como-utilizar-hooks' } }],
+    fallback: true,
   };
 };
 
 export const getStaticProps = async context => {
+  const { slug } = context.params;
   const prismic = getPrismicClient();
 
-  const { slug } = context.params;
+  const response = await prismic.getByUID('posts', String(slug), {});
 
-  const response = await prismic.getByUID('post', String(slug), {});
+  // console.log(response);
 
   const post = {
+    uid: response.uid,
+    first_publication_date: response.first_publication_date,
     data: {
-      title: RichText.asText(response.data.title),
-      banner: {
-        url: response.url,
-      },
+      author: response.data.author,
       content: {
-        heading: response.data.heading,
+        heading: response.data.content.heading,
         body: {
-          text: response.data.text,
+          text: response.data.content.body,
         },
+      },
+      banner: {
+        url: response.data.banner,
       },
     },
   };
