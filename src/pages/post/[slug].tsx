@@ -1,3 +1,5 @@
+/* eslint-disable react/no-danger */
+/* eslint-disable react/self-closing-comp */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { GetStaticPaths, GetStaticProps } from 'next';
@@ -46,18 +48,18 @@ export default function Post({ post }) {
             <span>Tempo de leitura!</span>
           </div>
         </header>
-        <article>
-          {post.data.content.map(elementContent => {
-            return (
-              <div className={styles.content}>
-                <strong>{elementContent.heading}</strong>
-                {elementContent.body.map(elementBody => {
-                  return <p>{elementBody.text}</p>;
-                })}
-              </div>
-            );
-          })}
-        </article>
+        {post.data.content.map(elementContent => {
+          return (
+            <article className={styles.content}>
+              <h2>{elementContent.heading}</h2>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: RichText.asHtml(elementContent.body),
+                }}
+              ></div>
+            </article>
+          );
+        })}
       </div>
     </>
   );
