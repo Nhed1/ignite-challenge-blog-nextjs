@@ -5,6 +5,9 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { RichText } from 'prismic-dom';
 
+import { format } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR';
+
 import Prismic from '@prismicio/client';
 import { getPrismicClient } from '../../services/prismic';
 
@@ -33,6 +36,7 @@ interface PostProps {
 }
 
 export default function Post({ post }: PostProps) {
+  console.log(post);
   return (
     <>
       <div className={styles.container}>
@@ -44,7 +48,16 @@ export default function Post({ post }: PostProps) {
             <div className={styles.info}>
               <span>{post.first_publication_date}</span>
               <span>{post.data.author}</span>
-              <span>Tempo de leitura!</span>
+              <span>
+                {post.data.content.reduce((acumulator, element) => {
+                  const AVARAGE_READ_TIME = 200; // 200 words per minute;
+                  const headingLen = element.heading.split(' ').length;
+                  const bodyLen = element.body[0].text.split(' ').length;
+                  acumulator += headingLen + bodyLen;
+                  return Math.ceil(acumulator / AVARAGE_READ_TIME);
+                }, 0)}
+                min
+              </span>
             </div>
           </header>
           {post.data.content.map(elementContent => {
@@ -89,7 +102,11 @@ export const getStaticProps = async context => {
   console.log(response.data.content);
   const post = {
     uid: response.uid,
-    first_publication_date: response.first_publication_date,
+    first_publication_date: format(
+      new Date(response.first_publication_date),
+      'dd MMM yyyy',
+      { locale: ptBR }
+    ),
     data: {
       title: response.data.title,
       author: response.data.author,
