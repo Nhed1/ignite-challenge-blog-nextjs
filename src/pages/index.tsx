@@ -37,7 +37,7 @@ interface HomeProps {
 }
 
 export default function Home({ postsPagination }: HomeProps): ReactElement {
-  const [posts, setPosts] = useState(postsPagination.results);
+  const [posts, setPosts] = useState<Post[]>(postsPagination.results);
   const [nextPage, setNextPage] = useState(postsPagination.next_page);
 
   async function loadNextPage(url: string) {
