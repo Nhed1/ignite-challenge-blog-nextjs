@@ -47,8 +47,16 @@ export default function Post({ post }) {
           </div>
         </header>
         <article>
-          {/* <strong>{post.data.content.heading}</strong> */}
-          {/* <p>{post.data.content.body.text}</p> */}
+          {post.data.content.map(elementContent => {
+            return (
+              <div className={styles.content}>
+                <strong>{elementContent.heading}</strong>
+                {elementContent.body.map(elementBody => {
+                  return <p>{elementBody.text}</p>;
+                })}
+              </div>
+            );
+          })}
         </article>
       </div>
     </>
@@ -83,12 +91,7 @@ export const getStaticProps = async context => {
     data: {
       title: response.data.title,
       author: response.data.author,
-      content: {
-        heading: RichText.asText(response.data.content),
-        body: {
-          text: response.data.content,
-        },
-      },
+      content: response.data.content,
       banner: {
         url: response.data.banner.url,
       },
