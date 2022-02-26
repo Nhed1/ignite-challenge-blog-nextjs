@@ -7,7 +7,7 @@ export default function Header(): ReactElement {
     <>
       <header className={styles.header}>
         <div className={styles.image}>
-          <img src="./images/Logo.svg" alt="logo" />
+          <img src="/images/Logo.svg" alt="logo" />
         </div>
       </header>
     </>

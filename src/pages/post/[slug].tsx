@@ -34,21 +34,23 @@ export default function Post({ post }) {
   console.log(post);
   return (
     <>
-      <div>
-        <img src="" alt="banner" />
-      </div>
-      <header>
-        <h1>titulo</h1>
-        <div className="info">
-          <span>data</span>
-          <span>autor</span>
-          <span>minutos</span>
+      <div key={post.uid} className={styles.container}>
+        <div>
+          <img src={post.data.banner.url} alt="banner" />
         </div>
-      </header>
-      <article>
-        <strong>conteudo heading 1</strong>
-        <p>artigo 1</p>
-      </article>
+        <header>
+          <h1>{post.title}</h1>
+          <div className="info">
+            <span>{post.first_publication_date}</span>
+            <span>{post.data.author}</span>
+            <span>Tempo de leitura!</span>
+          </div>
+        </header>
+        <article>
+          {/* <strong>{post.data.content.heading}</strong> */}
+          {/* <p>{post.data.content.body.text}</p> */}
+        </article>
+      </div>
     </>
   );
 }
@@ -74,20 +76,21 @@ export const getStaticProps = async context => {
   const prismic = getPrismicClient();
 
   const response = await prismic.getByUID('posts', String(slug), {});
-
+  console.log(response.data.content);
   const post = {
     uid: response.uid,
     first_publication_date: response.first_publication_date,
     data: {
+      title: response.data.title,
       author: response.data.author,
       content: {
-        heading: response.data.content,
+        heading: RichText.asText(response.data.content),
         body: {
           text: response.data.content,
         },
       },
       banner: {
-        url: response.data.banner,
+        url: response.data.banner.url,
       },
     },
   };
