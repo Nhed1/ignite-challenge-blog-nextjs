@@ -20,7 +20,8 @@
   }
 
   span {
-    display: block;
+    display: flex;
+    gap: 8px;
     color: var(--gray-500);
   }
 

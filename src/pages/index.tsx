@@ -6,6 +6,9 @@ import Link from 'next/link';
 import ptBR from 'date-fns/locale/pt-BR';
 import { format } from 'date-fns';
 
+import { FaUser } from 'react-icons/fa';
+import { BiTime } from 'react-icons/bi';
+
 import Prismic from '@prismicio/client';
 import { RichText } from 'prismic-dom';
 import { Head } from 'next/document';
@@ -58,11 +61,15 @@ export default function Home({ postsPagination }: HomeProps): ReactElement {
             <p>{post.data.subtitle}</p>
             <div className={styles.info}>
               <span>
+                <BiTime />
                 {format(new Date(post.first_publication_date), 'dd MMM yyyy', {
                   locale: ptBR,
                 })}
               </span>
-              <span>{post.data.author}</span>
+              <span>
+                <FaUser />
+                {post.data.author}
+              </span>
             </div>
 
             {nextPage && (
