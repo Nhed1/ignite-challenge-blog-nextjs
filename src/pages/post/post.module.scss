@@ -1,5 +1,6 @@
 .container {
   max-width: 1120px;
+  width: 100%;
 
   img {
     margin-top: 2rem;
@@ -21,7 +22,8 @@
       font-weight: 600;
     }
 
-    span {
+    span,
+    time {
       display: flex;
       gap: 8px;
       font-size: 0.9rem;

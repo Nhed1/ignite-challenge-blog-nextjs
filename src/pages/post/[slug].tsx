@@ -29,7 +29,7 @@ interface Post {
       url: string;
     };
     author: string;
-    content: {
+    content?: {
       heading: string;
       body: {
         text: string;
@@ -47,6 +47,13 @@ export default function Post({ post }: PostProps) {
   if (router.isFallback) {
     return <span>Carregando...</span>;
   }
+  const timeOfReading = post.data.content.reduce((acumulator, element) => {
+    const AVARAGE_READ_TIME = 200; // 200 words per minute;
+    const headingLen = element.heading.split(' ').length;
+    const bodyLen = element.body[0].text.split(' ').length;
+    acumulator += headingLen + bodyLen;
+    return Math.ceil(acumulator / AVARAGE_READ_TIME);
+  }, 0);
 
   return (
     <>
@@ -65,22 +72,15 @@ export default function Post({ post }: PostProps) {
                 <FaUser />
                 {post.data.author}
               </span>
-              <span>
+              <time>
                 <BiTime />
-                {post.data.content.reduce((acumulator, element) => {
-                  const AVARAGE_READ_TIME = 200; // 200 words per minute;
-                  const headingLen = element.heading.split(' ').length;
-                  const bodyLen = element.body[0].text.split(' ').length;
-                  acumulator += headingLen + bodyLen;
-                  return Math.ceil(acumulator / AVARAGE_READ_TIME);
-                }, 0)}
-                min
-              </span>
+                {timeOfReading} min
+              </time>
             </div>
           </header>
           {post.data.content.map(elementContent => {
             return (
-              <article className={styles.content}>
+              <article key={elementContent.heading} className={styles.content}>
                 <h2>{elementContent.heading}</h2>
                 <div
                   dangerouslySetInnerHTML={{
@@ -107,9 +107,11 @@ export const getStaticPaths: GetStaticPaths = async () => {
   );
 
   return {
-    paths: response.results.map(post => ({
-      params: { slug: post.uid },
-    })),
+    paths: response.results.map(post => {
+      return {
+        params: { slug: post.uid },
+      };
+    }),
     fallback: true,
   };
 };
