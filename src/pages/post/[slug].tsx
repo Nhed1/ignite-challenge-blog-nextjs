@@ -42,7 +42,7 @@ interface PostProps {
   post: Post;
 }
 
-export default function Post({ post }: PostProps) {
+export default function Post({ post }: PostProps): JSX.Element {
   const router = useRouter();
   if (router.isFallback) {
     return <span>Carregando...</span>;
@@ -66,7 +66,9 @@ export default function Post({ post }: PostProps) {
             <div className={styles.info}>
               <span>
                 <MdOutlineDateRange />
-                {post.first_publication_date}
+                {format(new Date(post.first_publication_date), 'dd MMM yyyy', {
+                  locale: ptBR,
+                })}
               </span>
               <span>
                 <FaUser />
@@ -116,18 +118,14 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-export const getStaticProps: GetStaticProps = async context => {
+export const getStaticProps: GetStaticProps<PostProps> = async context => {
   const { slug } = context.params;
   const prismic = getPrismicClient();
 
   const response = await prismic.getByUID('posts', String(slug), {});
   const post = {
     uid: response.uid,
-    first_publication_date: format(
-      new Date(response.first_publication_date),
-      'dd MMM yyyy',
-      { locale: ptBR }
-    ),
+    first_publication_date: response.first_publication_date,
     data: {
       title: response.data.title,
       author: response.data.author,
