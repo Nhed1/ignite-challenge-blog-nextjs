@@ -47,13 +47,19 @@ export default function Post({ post }: PostProps): JSX.Element {
   if (router.isFallback) {
     return <span>Carregando...</span>;
   }
-  const timeOfReading = post.data.content.reduce((acumulator, element) => {
-    const AVARAGE_READ_TIME = 200; // 200 words per minute;
-    const headingLen = element.heading.split(' ').length;
-    const bodyLen = element.body[0].text.split(' ').length;
-    acumulator += headingLen + bodyLen;
-    return Math.ceil(acumulator / AVARAGE_READ_TIME);
+  const AVARAGE_READ_TIME = 200; // 200 words per minute;
+
+  const totalWords = post.data.content.reduce((acumulator, item) => {
+    return (
+      acumulator +
+      item.heading?.split(' ').length +
+      item.body.reduce((acumulator2, contentBody) => {
+        return acumulator2 + contentBody.text.split(' ').length;
+      }, 0)
+    );
   }, 0);
+
+  const timeOfReading = Math.ceil(totalWords / AVARAGE_READ_TIME);
 
   return (
     <>
@@ -80,18 +86,23 @@ export default function Post({ post }: PostProps): JSX.Element {
               </time>
             </div>
           </header>
-          {post.data.content.map(elementContent => {
-            return (
-              <article key={elementContent.heading} className={styles.content}>
-                <h2>{elementContent.heading}</h2>
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: RichText.asHtml(elementContent.body),
-                  }}
-                ></div>
-              </article>
-            );
-          })}
+          <div>
+            {post.data.content.map(elementContent => {
+              return (
+                <article
+                  key={elementContent.heading}
+                  className={styles.content}
+                >
+                  <h2>{elementContent.heading}</h2>
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: RichText.asHtml(elementContent.body),
+                    }}
+                  ></div>
+                </article>
+              );
+            })}
+          </div>
         </div>
       </div>
     </>
@@ -118,22 +129,11 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-export const getStaticProps: GetStaticProps<PostProps> = async context => {
+export const getStaticProps: GetStaticProps = async context => {
   const { slug } = context.params;
   const prismic = getPrismicClient();
 
-  const response = await prismic.getByUID('posts', String(slug), {});
-  const post = {
-    uid: response.uid,
-    first_publication_date: response.first_publication_date,
-    data: {
-      title: response.data.title,
-      author: response.data.author,
-      content: response.data.content,
-      banner: {
-        url: response.data.banner.url,
-      },
-    },
-  };
+  const post = await prismic.getByUID('posts', String(slug), {});
+
   return { props: { post }, revalidate: 60 * 5 }; // 5 minutes
 };
