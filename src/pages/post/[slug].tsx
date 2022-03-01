@@ -20,6 +20,7 @@ import { getPrismicClient } from '../../services/prismic';
 
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
+import { useEffect } from 'react';
 
 interface Post {
   first_publication_date: string | null;
@@ -42,11 +43,31 @@ interface PostProps {
   post: Post;
 }
 
+export const UtterancesComments: React.FC = () => (
+  <section
+    ref={elem => {
+      if (!elem) {
+        return;
+      }
+      const scriptElem = document.createElement('script');
+      scriptElem.src = 'https://utteranc.es/client.js';
+      scriptElem.async = true;
+      scriptElem.crossOrigin = 'anonymous';
+      scriptElem.setAttribute('repo', 'Nhed1/ignite-challenge-blog-nextjs');
+      scriptElem.setAttribute('issue-term', 'pathname');
+      scriptElem.setAttribute('label', 'blog-comment');
+      scriptElem.setAttribute('theme', 'github-dark');
+      elem.appendChild(scriptElem);
+    }}
+  />
+);
+
 export default function Post({ post }: PostProps): JSX.Element {
   const router = useRouter();
   if (router.isFallback) {
     return <span>Carregando...</span>;
   }
+
   const AVARAGE_READ_TIME = 200; // 200 words per minute;
 
   const totalWords = post.data.content.reduce((acumulator, item) => {
@@ -65,7 +86,6 @@ export default function Post({ post }: PostProps): JSX.Element {
     <>
       <div className={styles.container}>
         <img src={post.data.banner.url} alt="banner" />
-
         <div className={styles.content}>
           <header className={styles.header}>
             <h1>{post.data.title}</h1>
@@ -103,6 +123,7 @@ export default function Post({ post }: PostProps): JSX.Element {
               );
             })}
           </div>
+          <UtterancesComments />
         </div>
       </div>
     </>
