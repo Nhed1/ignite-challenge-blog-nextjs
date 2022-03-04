@@ -21,6 +21,7 @@ import { getPrismicClient } from '../../services/prismic';
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
 import { useEffect } from 'react';
+import { previousWednesday } from 'date-fns/esm';
 
 interface Post {
   first_publication_date: string | null;
@@ -63,11 +64,13 @@ export const UtterancesComments: React.FC = () => (
 );
 
 export default function Post({ post }: PostProps): JSX.Element {
+  //fallback
   const router = useRouter();
   if (router.isFallback) {
     return <span>Carregando...</span>;
   }
 
+  // time reading
   const AVARAGE_READ_TIME = 200; // 200 words per minute;
 
   const totalWords = post.data.content.reduce((acumulator, item) => {
@@ -123,6 +126,7 @@ export default function Post({ post }: PostProps): JSX.Element {
               );
             })}
           </div>
+          <div className={styles.nextAndPrevious}>{}</div>
           <UtterancesComments />
         </div>
       </div>
@@ -156,5 +160,32 @@ export const getStaticProps: GetStaticProps = async context => {
 
   const post = await prismic.getByUID('posts', String(slug), {});
 
-  return { props: { post }, revalidate: 60 * 5 }; // 5 minutes
+  // const nextResponse = await prismic.query(
+  //   [Prismic.predicates.at('document.type', 'posts')],
+  //   {
+  //     pageSize: 1,
+  //     after: post.id,
+  //     orderings: 'document.first_publication_date',
+  //   }
+  // );
+
+  // const previousResponse = await prismic.query(
+  //   [Prismic.predicates.at('document.type', 'posts')],
+  //   {
+  //     pageSize: 1,
+  //     after: post.id,
+  //     orderings: 'document.first_publication_date desc',
+  //   }
+  // );
+
+  return {
+    props: {
+      post,
+      // prevNextPosts: {
+      //   prevPost: previousResponse.results[0] ?? null,
+      //   nextPost: nextResponse.results[0] ?? null,
+      // },
+    },
+    revalidate: 60 * 5,
+  }; // 5 minutes
 };
