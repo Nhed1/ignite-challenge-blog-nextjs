@@ -11,11 +11,12 @@ function linkResolver(doc: Document): string {
 export default async (req, res) => {
   const { token: ref, documentId } = req.query;
 
-  const Client = getPrismicClient();
+  const Client = getPrismicClient(req);
 
-  const redirectUrl = await Client(req)
-    .getPreviewResolver(ref, documentId)
-    .resolve(linkResolver, '/');
+  const redirectUrl = await Client.getPreviewResolver(ref, documentId).resolve(
+    linkResolver,
+    '/'
+  );
 
   if (!redirectUrl) {
     return res.status(401).json({ message: 'Invalid token' });
