@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { GetStaticPaths, GetStaticProps } from 'next';
+import Link from 'next/link';
 import { RichText } from 'prismic-dom';
 
 import { format } from 'date-fns';
@@ -42,6 +43,8 @@ interface Post {
 
 interface PostProps {
   post: Post;
+  previousPost;
+  nextPost;
 }
 
 export const UtterancesComments: React.FC = () => (
@@ -63,7 +66,11 @@ export const UtterancesComments: React.FC = () => (
   />
 );
 
-export default function Post({ post }: PostProps): JSX.Element {
+export default function Post({
+  post,
+  previousPost,
+  nextPost,
+}: PostProps): JSX.Element {
   //fallback
   const router = useRouter();
   if (router.isFallback) {
@@ -126,7 +133,25 @@ export default function Post({ post }: PostProps): JSX.Element {
               );
             })}
           </div>
-          <div className={styles.nextAndPrevious}>{}</div>
+          <div className={styles.nextAndPrevious}>
+            {previousPost && (
+              <Link href={`/post/${previousPost.uid}`}>
+                <a className={styles.previous}>
+                  {previousPost.data.title}
+                  <span>Post anterior</span>
+                </a>
+              </Link>
+            )}
+            {nextPost && (
+              <Link href={`/post/${nextPost.uid}`}>
+                <a className={styles.next}>
+                  {nextPost.data.title}
+                  <span>Próximo post</span>
+                </a>
+              </Link>
+            )}
+          </div>
+
           <UtterancesComments />
         </div>
       </div>
@@ -160,31 +185,39 @@ export const getStaticProps: GetStaticProps = async context => {
 
   const post = await prismic.getByUID('posts', String(slug), {});
 
-  // const nextResponse = await prismic.query(
-  //   [Prismic.predicates.at('document.type', 'posts')],
-  //   {
-  //     pageSize: 1,
-  //     after: post.id,
-  //     orderings: 'document.first_publication_date',
-  //   }
-  // );
+  const previous = await prismic.query(
+    Prismic.predicates.at('document.type', 'posts'),
+    {
+      pageSize: 1,
+      after: post.id,
+      orderings: '[document.first_publication_date]',
+    }
+  );
 
-  // const previousResponse = await prismic.query(
-  //   [Prismic.predicates.at('document.type', 'posts')],
-  //   {
-  //     pageSize: 1,
-  //     after: post.id,
-  //     orderings: 'document.first_publication_date desc',
-  //   }
-  // );
+  const next = await prismic.query(
+    Prismic.predicates.at('document.type', 'posts'),
+    {
+      pageSize: 1,
+      after: post.id,
+      orderings: '[document.first_publication_date desc]',
+    }
+  );
 
   return {
     props: {
       post,
-      // prevNextPosts: {
-      //   prevPost: previousResponse.results[0] ?? null,
-      //   nextPost: nextResponse.results[0] ?? null,
-      // },
+      previousPost: previous.results.length
+        ? {
+            uid: previous.results[0].uid,
+            data: { title: previous.results[0].data.title },
+          }
+        : null,
+      nextPost: next.results.length
+        ? {
+            uid: next.results[0].uid,
+            data: { title: next.results[0].data.title },
+          }
+        : null,
     },
     revalidate: 60 * 5,
   }; // 5 minutes

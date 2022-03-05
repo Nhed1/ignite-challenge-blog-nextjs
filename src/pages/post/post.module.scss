@@ -42,3 +42,18 @@
     font-weight: 600;
   }
 }
+
+.nextAndPrevious {
+  padding: 0 2rem;
+
+  margin: 40px 0;
+  a {
+    color: #ffffff;
+
+    display: flex;
+    flex-direction: column;
+  }
+  span {
+    color: var(--pink);
+  }
+}
